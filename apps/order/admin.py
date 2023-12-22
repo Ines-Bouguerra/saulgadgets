@@ -9,7 +9,7 @@ from django.utils.safestring import mark_safe
 from .models import Order, OrderItem
 
 def order_name(obj):
-    return '%s %s' % (obj.first_name, obj.last_name)
+    return f'{obj.first_name} {obj.last_name}'
 order_name.short_description = 'Name'
 
 def order_pdf(obj):

@@ -9,6 +9,6 @@ class Userprofile(models.Model):
     phone = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
-        return '%s' % self.user.username
+        return f'{self.user.username}'
 
 User.userprofile = property(lambda u:Userprofile.objects.get_or_create(user=u)[0])

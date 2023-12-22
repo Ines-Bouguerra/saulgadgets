@@ -5,8 +5,8 @@ from apps.store.models import Product, Category
 def frontpage(request):
     products = Product.objects.filter(is_featured=True)
     featured_categories = Category.objects.filter(is_featured=True)
-    popular_products = Product.objects.all().order_by('-num_visits')[0:4]
-    recently_viewed_products = Product.objects.all().order_by('-last_visit')[0:4]
+    popular_products = Product.objects.all().order_by('-num_visits')[:4]
+    recently_viewed_products = Product.objects.all().order_by('-last_visit')[:4]
 
     context = {
         'products': products,

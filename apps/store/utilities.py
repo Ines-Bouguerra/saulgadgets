@@ -22,7 +22,7 @@ def send_order_confirmation(order):
     msg.attach_alternative(html_content, "text/html")
 
     if pdf:
-        name = 'order_%s.pdf' % order.id
+        name = f'order_{order.id}.pdf'
         msg.attach(name, pdf, 'application/pdf')
-    
+
     msg.send()

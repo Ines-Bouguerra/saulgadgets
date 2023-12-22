@@ -50,7 +50,7 @@ def product_detail(request, category_slug, slug):
     #
 
     related_products = list(product.category.products.filter(parent=None).exclude(id=product.id))
-    
+
     if len(related_products) >= 3:
         related_products = random.sample(related_products, 3)
 
@@ -64,11 +64,7 @@ def product_detail(request, category_slug, slug):
 
     cart = Cart(request)
 
-    if cart.has_product(product.id):
-        product.in_cart = True
-    else:
-        product.in_cart = False
-
+    product.in_cart = bool(cart.has_product(product.id))
     context = {
         'product': product,
         'imagesstring': imagesstring,

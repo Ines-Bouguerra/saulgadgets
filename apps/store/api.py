@@ -69,7 +69,7 @@ def create_checkout_session(request):
 
     cart = Cart(request)
     items = []
-    
+
     for item in cart:
         product = item['product']
 
@@ -95,7 +95,7 @@ def create_checkout_session(request):
     session = ''
     order_id = ''
     payment_intent = ''
-    
+
     if gateway == 'stripe':
         stripe.api_key = settings.STRIPE_API_KEY_HIDDEN
         session = stripe.checkout.Session.create(
@@ -120,19 +120,6 @@ def create_checkout_session(request):
 
     if coupon_value > 0:
         total_price = total_price * (coupon_value / 100)
-    
-    if gateway == 'razorpay':
-        order_amount = total_price * 100
-        order_currency = 'INR'
-        client = razorpay.Client(auth=(settings.RAZORPAY_API_KEY_PUBLISHABLE, settings.RAZORPAY_API_KEY_HIDDEN))
-        data = {
-            'amount': order_amount,
-            'currency': order_currency
-        }
-
-        payment_intent = client.order.create(data=data)
-    
-    # PayPal
 
     if gateway == 'paypal':
         order_id = data['order_id']
@@ -156,13 +143,23 @@ def create_checkout_session(request):
         else:
             order.paid = False
             order.save()
+    elif gateway == 'razorpay':
+        client = razorpay.Client(auth=(settings.RAZORPAY_API_KEY_PUBLISHABLE, settings.RAZORPAY_API_KEY_HIDDEN))
+        order_amount = total_price * 100
+        data = {'amount': order_amount, 'currency': 'INR'}
+
+        payment_intent = client.order.create(data=data)
+
+        order = Order.objects.get(pk=orderid)
+        order.payment_intent = payment_intent['id']
+        order.paid_amount = total_price
+        order.used_coupon = coupon_code
+        order.save()
+
     else:
         order = Order.objects.get(pk=orderid)
-        if gateway == 'razorpay':
-            order.payment_intent = payment_intent['id']
-        else:
-            order.payment_intent = payment_intent
         order.paid_amount = total_price
+        order.payment_intent = payment_intent
         order.used_coupon = coupon_code
         order.save()
 

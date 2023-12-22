@@ -15,22 +15,17 @@ def render_to_pdf(template_src, context_dict={}):
     result = BytesIO()
     pdf = pisa.pisaDocument(BytesIO(html.encode("ISO-8859-1")), result)
 
-    if not pdf.err:
-        return result.getvalue()
-    
-    return None
+    return result.getvalue() if not pdf.err else None
 
 @login_required
 def admin_order_pdf(request, order_id):
     if request.user.is_superuser:
         order = get_object_or_404(Order, pk=order_id)
-        pdf = render_to_pdf('order_pdf.html', {'order': order})
-
-        if pdf:
+        if pdf := render_to_pdf('order_pdf.html', {'order': order}):
             response = HttpResponse(pdf, content_type='application/pdf')
-            content = "attachment; filename=%s.pdf" % order_id
+            content = f"attachment; filename={order_id}.pdf"
             response['Content-Disposition'] = content
 
             return response
-    
+
     return HttpResponse("Not found")

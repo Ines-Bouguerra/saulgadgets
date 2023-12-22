@@ -10,10 +10,7 @@ def api_can_use(request):
     try:
         coupon = Coupon.objects.get(code=coupon_code)
 
-        if coupon.can_use():
-            json_response = {'amount': coupon.value}
-        else:
-            json_response = {'amount': 0}
+        json_response = {'amount': coupon.value} if coupon.can_use() else {'amount': 0}
     except Exception:
         json_response = {'amount': 0}
 

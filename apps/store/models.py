@@ -19,7 +19,7 @@ class Category(models.Model):
         return self.title
     
     def get_absolute_url(self):
-        return '/%s/' % (self.slug)
+        return f'/{self.slug}/'
 
 class Product(models.Model):
     category = models.ForeignKey(Category, related_name='products', on_delete=models.CASCADE)
@@ -49,19 +49,18 @@ class Product(models.Model):
         super().save(*args, **kwargs)"""
     
     def get_absolute_url(self):
-        return '/%s/%s/' % (self.category.slug, self.slug)
+        return f'/{self.category.slug}/{self.slug}/'
 
     def get_thumbnail(self):
         if self.thumbnail:
             return self.thumbnail.url
+        if self.image:
+            self.thumbnail = self.make_thumbnail(self.image)
+            self.save()
+
+            return self.thumbnail.url
         else:
-            if self.image:
-                self.thumbnail = self.make_thumbnail(self.image)
-                self.save()
-                
-                return self.thumbnail.url
-            else:
-                return ''
+            return ''
     
     def make_thumbnail(self, image, size=(300, 200)):
         img = Image.open(image)
@@ -78,10 +77,7 @@ class Product(models.Model):
     def get_rating(self):
         total = sum(int(review['stars']) for review in self.reviews.values())
 
-        if self.reviews.count() > 0:
-            return total / self.reviews.count()
-        else:
-            return 0
+        return total / self.reviews.count() if self.reviews.count() > 0 else 0
 
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, related_name='images', on_delete=models.CASCADE)

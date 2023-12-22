@@ -36,7 +36,7 @@ class Order(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=ORDERED)
 
     def __str__(self):
-        return '%s' % self.first_name
+        return f'{self.first_name}'
     
     def get_total_quantity(self):
         return sum(int(item.quantity) for item in self.items.all())
@@ -48,4 +48,4 @@ class OrderItem(models.Model):
     quantity = models.IntegerField(default=1)
 
     def __str__(self):
-        return '%s' % self.id
+        return f'{self.id}'
